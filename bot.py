@@ -3,7 +3,7 @@ import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 import time
 
-TOKEN = '8010552463:AAEgo_8md0yfHY-k_UR5dWRLSKVXtbx2NpE'
+TOKEN = '8187799175:AAFJ8QqVJrV7_qEgPQ6_cD3pxJ1IZF7xyY8'
 bot = telebot.TeleBot(TOKEN)
 
 # user_id ga asoslangan foydalanuvchilarni bog'lash
