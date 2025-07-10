@@ -1,11 +1,11 @@
+import os
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-import time
 
-TOKEN = '8187799175:AAFJ8QqVJrV7_qEgPQ6_cD3pxJ1IZF7xyY8'
-bot = telebot.TeleBot(TOKEN)
+# Tokenni environment variable orqali olish
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+bot = telebot.TeleBot(BOT_TOKEN)
 
-# user_id ga asoslangan foydalanuvchilarni bog'lash
 users = {}  # anonymous_user_id: original_user_id
 conversations = {}  # original_user_id: anonymous_user_id
 
@@ -19,16 +19,14 @@ def handle_start(message):
         try:
             ref_id = int(args[1])
             if ref_id != user_id:
-                # xabar yuborish original egasiga
-                users[user_id] = ref_id  # kimga yozmoqda
-                conversations[ref_id] = user_id  # suhbat davom ettirish uchun
+                users[user_id] = ref_id
+                conversations[ref_id] = user_id
 
                 bot.send_message(user_id, "✉️ Xabaringizni yozing, u anonim tarzda yuboriladi.")
                 bot.send_message(ref_id, f"📨 Yangi anonim xabar keldi!", reply_markup=reply_button(user_id))
         except ValueError:
             bot.send_message(user_id, "Xatolik! Iltimos, to'g'ri ID kiriting.")
 
-    # har doim shaxsiy havola yuboriladi
     link = f"https://t.me/{bot.get_me().username}?start={user_id}"
     bot.send_message(user_id, f"👋 {username}, botga xush kelibsiz!\nSizning shaxsiy havolangiz:\n{link}")
 
