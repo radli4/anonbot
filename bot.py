@@ -1,4 +1,3 @@
-
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 import time
@@ -17,15 +16,17 @@ def handle_start(message):
     username = message.from_user.first_name or "Foydalanuvchi"
 
     if len(args) > 1:
-        ref_id = int(args[1])
-        if ref_id != user_id:
-            # xabar yuborish original egasiga
-            text = f"📩 Sizga anonim xabar yozishmoqchi.\nYozing!"
-            users[user_id] = ref_id  # kimga yozmoqda
-            conversations[ref_id] = user_id  # suhbat davom ettirish uchun
+        try:
+            ref_id = int(args[1])
+            if ref_id != user_id:
+                # xabar yuborish original egasiga
+                users[user_id] = ref_id  # kimga yozmoqda
+                conversations[ref_id] = user_id  # suhbat davom ettirish uchun
 
-            bot.send_message(user_id, "✉️ Xabaringizni yozing, u anonim tarzda yuboriladi.")
-            bot.send_message(ref_id, f"📨 Yangi anonim xabar keldi!", reply_markup=reply_button(user_id))
+                bot.send_message(user_id, "✉️ Xabaringizni yozing, u anonim tarzda yuboriladi.")
+                bot.send_message(ref_id, f"📨 Yangi anonim xabar keldi!", reply_markup=reply_button(user_id))
+        except ValueError:
+            bot.send_message(user_id, "Xatolik! Iltimos, to'g'ri ID kiriting.")
 
     # har doim shaxsiy havola yuboriladi
     link = f"https://t.me/{bot.get_me().username}?start={user_id}"
@@ -49,11 +50,13 @@ def forward_anonymous_message(message):
 @bot.callback_query_handler(func=lambda call: call.data.startswith("reply:"))
 def handle_reply(call):
     from_user = call.from_user.id
-    anon_id = int(call.data.split(":")[1])
-
-    conversations[from_user] = anon_id
-    bot.send_message(from_user, "✏️ Javobingizni yozing, u anonim tarzda yuboriladi.")
-    bot.answer_callback_query(call.id, "Endi javob yozishingiz mumkin.")
+    try:
+        anon_id = int(call.data.split(":")[1])
+        conversations[from_user] = anon_id
+        bot.send_message(from_user, "✏️ Javobingizni yozing, u anonim tarzda yuboriladi.")
+        bot.answer_callback_query(call.id, "Endi javob yozishingiz mumkin.")
+    except ValueError:
+        bot.answer_callback_query(call.id, "Noto'g'ri javob formati.")
 
 @bot.message_handler(func=lambda m: m.from_user.id in conversations)
 def handle_reply_message(message):
